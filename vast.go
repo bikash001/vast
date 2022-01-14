@@ -37,6 +37,14 @@ type CDATAString struct {
 	CDATA string `xml:",cdata"`
 }
 
+type Creatives struct {
+	List []Creative `xml:"Creative,omitempty"`
+}
+
+type Extensions struct {
+	List []Extension `xml:"Extension,omitempty"`
+}
+
 // InLine is a vast <InLine> ad element containing actual ad definition
 //
 // The last ad server in the ad supply chain serves an <InLine> element.
@@ -51,7 +59,7 @@ type InLine struct {
 	// video player should request when the first frame of the ad is displayed
 	Impressions []Impression `xml:"Impression"`
 	// The container for one or more <Creative> elements
-	Creatives []Creative `xml:"Creatives>Creative"`
+	Creatives Creatives `xml:"Creatives,omitempty"`
 	// A string value that provides a longer description of the ad.
 	Description CDATAString `xml:",omitempty"`
 	// The name of the advertiser as defined by the ad serving party.
@@ -78,7 +86,7 @@ type InLine struct {
 	// custom element should be nested under <Extensions> to help separate custom
 	// XML elements from VAST elements. The following example includes a custom
 	// xml element within the Extensions element.
-	Extensions *[]Extension `xml:"Extensions>Extension,omitempty"`
+	Extensions *Extensions `xml:"Extensions,omitempty"`
 }
 
 // Impression is a URI that directs the video player to a tracking resource file that
@@ -122,7 +130,7 @@ type Wrapper struct {
 	// times.
 	Errors []CDATAString `xml:"Error,omitempty"`
 	// The container for one or more <Creative> elements
-	Creatives []CreativeWrapper `xml:"Creatives>Creative"`
+	Creatives Creatives `xml:"Creatives,omitempty"`
 	// XML node for custom extensions, as defined by the ad server. When used, a
 	// custom element should be nested under <Extensions> to help separate custom
 	// XML elements from VAST elements. The following example includes a custom
@@ -138,6 +146,10 @@ type Wrapper struct {
 type AdSystem struct {
 	Version string `xml:"version,attr,omitempty"`
 	Name    string `xml:",cdata"`
+}
+
+type CreativeExtensions struct {
+	List []Extension `xml:"CreativeExtension,omitempty"`
 }
 
 // Creative is a file that is part of a VAST ad.
@@ -169,7 +181,7 @@ type Creative struct {
 	// of VAST.
 	// The nested <CreativeExtension> includes an attribute for type, which
 	// specifies the MIME type needed to execute the extension.
-	CreativeExtensions *[]Extension `xml:"CreativeExtensions>CreativeExtension,omitempty"`
+	CreativeExtensions *CreativeExtensions `xml:"CreativeExtensions,omitempty"`
 }
 
 // CompanionAds contains companions creatives
@@ -181,9 +193,13 @@ type CompanionAds struct {
 	Companions []Companion `xml:"Companion,omitempty"`
 }
 
+type TrackingEvents struct {
+	List []Tracking `xml:"Tracking,omitempty"`
+}
+
 // NonLinearAds contains non linear creatives
 type NonLinearAds struct {
-	TrackingEvents []Tracking `xml:"TrackingEvents>Tracking,omitempty"`
+	TrackingEvents TrackingEvents `xml:"TrackingEvents,omitempty"`
 	// Non linear creatives
 	NonLinears []NonLinear `xml:"NonLinear,omitempty"`
 }
@@ -215,9 +231,13 @@ type CompanionAdsWrapper struct {
 
 // NonLinearAdsWrapper contains non linear creatives in a wrapper
 type NonLinearAdsWrapper struct {
-	TrackingEvents []Tracking `xml:"TrackingEvents>Tracking,omitempty"`
+	TrackingEvents TrackingEvents `xml:"TrackingEvents,omitempty"`
 	// Non linear creatives
 	NonLinears []NonLinearWrapper `xml:"NonLinear,omitempty"`
+}
+
+type MediaFiles struct {
+	List []MediaFile `xml:"MediaFile,omitempty"`
 }
 
 // Linear is the most common type of video advertisement trafficked in the
@@ -240,16 +260,16 @@ type Linear struct {
 	Duration       Duration
 	AdParameters   *AdParameters `xml:",omitempty"`
 	Icons          *Icons
-	TrackingEvents []Tracking   `xml:"TrackingEvents>Tracking,omitempty"`
-	VideoClicks    *VideoClicks `xml:",omitempty"`
-	MediaFiles     []MediaFile  `xml:"MediaFiles>MediaFile,omitempty"`
+	TrackingEvents TrackingEvents `xml:"TrackingEvents,omitempty"`
+	VideoClicks    *VideoClicks   `xml:",omitempty"`
+	MediaFiles     MediaFiles     `xml:"MediaFiles,omitempty"`
 }
 
 // LinearWrapper defines a wrapped linear creative
 type LinearWrapper struct {
 	Icons          *Icons
-	TrackingEvents []Tracking   `xml:"TrackingEvents>Tracking,omitempty"`
-	VideoClicks    *VideoClicks `xml:",omitempty"`
+	TrackingEvents TrackingEvents `xml:"TrackingEvents,omitempty"`
+	VideoClicks    *VideoClicks   `xml:",omitempty"`
 }
 
 // Companion defines a companion ad
@@ -280,7 +300,7 @@ type Companion struct {
 	AltText string `xml:",omitempty"`
 	// The creativeView should always be requested when present. For Companions
 	// creativeView is the only supported event.
-	TrackingEvents []Tracking `xml:"TrackingEvents>Tracking,omitempty"`
+	TrackingEvents TrackingEvents `xml:"TrackingEvents,omitempty"`
 	// Data to be passed into the companion ads. The apiFramework defines the method
 	// to use for communication (e.g. “FlashVar”)
 	AdParameters *AdParameters `xml:",omitempty"`
@@ -320,7 +340,7 @@ type CompanionWrapper struct {
 	AltText string `xml:",omitempty"`
 	// The creativeView should always be requested when present. For Companions
 	// creativeView is the only supported event.
-	TrackingEvents []Tracking `xml:"TrackingEvents>Tracking,omitempty"`
+	TrackingEvents TrackingEvents `xml:"TrackingEvents,omitempty"`
 	// Data to be passed into the companion ads. The apiFramework defines the method
 	// to use for communication (e.g. “FlashVar”)
 	AdParameters *AdParameters `xml:",omitempty"`
@@ -389,7 +409,7 @@ type NonLinearWrapper struct {
 	// The apiFramework defines the method to use for communication with the nonlinear element.
 	APIFramework string `xml:"apiFramework,attr,omitempty"`
 	// The creativeView should always be requested when present.
-	TrackingEvents []Tracking `xml:"TrackingEvents>Tracking,omitempty"`
+	TrackingEvents TrackingEvents `xml:"TrackingEvents,omitempty"`
 	// URLs to ping when user clicks on the the non-linear ad.
 	NonLinearClickTracking []CDATAString `xml:",omitempty"`
 }
@@ -397,6 +417,11 @@ type NonLinearWrapper struct {
 type Icons struct {
 	XMLName xml.Name `xml:"Icons,omitempty"`
 	Icon    []Icon   `xml:"Icon,omitempty"`
+}
+
+type IconClicks struct {
+	Cdata  CDATAString   `xml:"IconClickThrough,omitempty"`
+	Cdatas []CDATAString `xml:"IconClickTracking,omitempty"`
 }
 
 // Icon represents advertising industry initiatives like AdChoices.
@@ -420,9 +445,9 @@ type Icon struct {
 	// The apiFramework defines the method to use for communication with the icon element
 	APIFramework string `xml:"apiFramework,attr,omitempty"`
 	// URL to open as destination page when user clicks on the icon.
-	IconClickThrough CDATAString `xml:"IconClicks>IconClickThrough,omitempty"`
+	IconClickThrough IconClicks `xml:"IconClicks,omitempty"`
 	// URLs to ping when user clicks on the the icon.
-	IconClickTrackings []CDATAString `xml:"IconClicks>IconClickTracking,omitempty"`
+	// IconClickTrackings ClickTrackings `xml:"IconClicks,omitempty"`
 	// URL to a static file, such as an image or SWF file
 	StaticResource *StaticResource `xml:",omitempty"`
 	// URL source for an IFrame to display the companion element
